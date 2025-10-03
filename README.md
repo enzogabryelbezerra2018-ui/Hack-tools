@@ -30,3 +30,51 @@ Ferramenta em **Go** para backup e compactação de arquivos, com logs coloridos
 
 # Windows
 run.bat
+
+
+3.	Aguarde a compactação terminar.
+	4.	Confira:
+	•	Backup: data.zip
+	•	Log visual: log.png
+---
+
+## 2️⃣ `USB-logic.go`
+
+Esse arquivo vai conter **lógica para detectar se um dispositivo USB está conectado** (para simular o alerta do seu programa).  
+Observação: Go puro não acessa diretamente USB no Android ou Windows sem libs externas. Aqui vai uma **simulação básica para Linux/macOS**:
+
+```go
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"time"
+)
+
+// Pasta de exemplo onde dispositivos montados aparecem (Linux)
+const usbMountPath = "/media" // no Windows, poderia ser "E:\\"
+
+func checkUSBConnected() bool {
+	files, err := ioutil.ReadDir(usbMountPath)
+	if err != nil {
+		return false
+	}
+	return len(files) > 0
+}
+
+func waitForUSB() {
+	fmt.Println("[INFO] Aguardando dispositivo USB...")
+	for {
+		if checkUSBConnected() {
+			fmt.Println("[OK] Dispositivo USB detectado!")
+			return
+		}
+		time.Sleep(2 * time.Second)
+	}
+}
+
+func main() {
+	waitForUSB()
+	fmt.Println("[INFO] Pode iniciar a ferramenta de backup")
+}
